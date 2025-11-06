@@ -1,0 +1,14 @@
+services:
+  kokowaf:
+    restart: always
+    build: .
+    ports:
+      - "5008:80"
+    environment:
+      FLAG: BHFlagY{1260dd27cbdc026d8c6142db04f483c9}
+    privileged: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail http://127.0.0.1:80 || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,30 @@
+
+--
+-- Database: `kokowaf`
+--
+CREATE DATABASE IF NOT EXISTS `kokowaf` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `kokowaf`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` varchar(32) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `full_name` varchar(255) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=66 ;
+
+CREATE TABLE IF NOT EXISTS `flags` (
+  `id` varchar(32) NOT NULL,
+  `flag` varchar(255) NOT NULL
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=66 ;
+
+-- Insert admin user with profile information
+insert into users(id,username,password,email,full_name) values('1','admin','5335af51f29d59b42e8fa23b153c1c481419e34e','admin@kokowaf.com','System Administrator');
