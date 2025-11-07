@@ -51,13 +51,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(len(login))
 	fmt.Println(int32(len(login)))
 	connect()
-	var stored1 string
-	err := db.QueryRow(r.Context(),
-		`SELECT password FROM users WHERE login = '1`).
-		Scan(&stored1)
 
 	var stored string
-	err = db.QueryRow(r.Context(),
+	err := db.QueryRow(r.Context(),
 		`SELECT COUNT(*) FROM users WHERE login = $1 AND password = $2`, login, password).
 		Scan(&stored)
 	if err != nil {
