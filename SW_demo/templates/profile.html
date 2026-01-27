@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Profile</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; }
+      .row { display: flex; gap: 32px; align-items: flex-start; }
+      .card { padding: 16px; border: 1px solid #ccc; border-radius: 8px; }
+      img { max-width: 160px; max-height: 160px; border-radius: 8px; }
+      label { display: block; margin: 8px 0 4px; }
+      input, textarea { width: 100%; padding: 6px; }
+      button { margin-top: 8px; }
+      .history { margin-top: 24px; }
+      .history-item { padding: 8px 0; border-bottom: 1px solid #eee; }
+      .meta { color: #666; font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <h1>Profile</h1>
+
+    <div class="row">
+      <div class="card">
+        <h2>User</h2>
+        {% if user.avatar_path %}
+          <img src="{{ user.avatar_path }}" alt="Avatar">
+        {% else %}
+          <div>No avatar</div>
+        {% endif %}
+        <div><strong>Name:</strong> {{ user.username }}</div>
+        <div><strong>Balance:</strong> {{ user.balance }}</div>
+
+        <form action="{{ url_for('profile') }}" method="get">
+          <label for="user_id">Switch user</label>
+          <select id="user_id" name="user_id">
+            {% for u in users %}
+              <option value="{{ u.id }}" {% if u.id == active_user_id %}selected{% endif %}>
+                {{ u.username }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit">Apply</button>
+        </form>
+
+        <form action="{{ url_for('upload_avatar') }}" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="user_id" value="{{ active_user_id }}">
+          <label for="avatar">Upload avatar</label>
+          <input id="avatar" name="avatar" type="file">
+          <button type="submit">Upload</button>
+        </form>
+      </div>
+
+      <div class="card" style="min-width: 320px;">
+        <h2>Send transfer</h2>
+        <form action="{{ url_for('transfer') }}" method="post">
+          <input type="hidden" name="user_id" value="{{ active_user_id }}">
+          <label for="to_username">To user</label>
+          <input id="to_username" name="to_username" type="text" required>
+
+          <label for="amount">Amount</label>
+          <input id="amount" name="amount" type="text" placeholder="100.00">
+
+          <label for="message">Message (XSS works here)</label>
+          <textarea id="message" name="message" rows="4"></textarea>
+
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="history">
+      <h2>Transfer history</h2>
+      {% if transfers %}
+        {% for t in transfers %}
+          <div class="history-item">
+            {% if t.from_user_id == active_user_id %}
+              <div><strong>Direction:</strong> Outgoing</div>
+              <div><strong>To:</strong> {{ t.to_username }} <span class="meta">({{ t.created_at }})</span></div>
+            {% else %}
+              <div><strong>Direction:</strong> Incoming</div>
+              <div><strong>From:</strong> {{ t.from_username }} <span class="meta">({{ t.created_at }})</span></div>
+            {% endif %}
+            <div><strong>Amount:</strong> {{ t.amount }}</div>
+            <div><strong>Message:</strong> <span>{{ t.message | safe }}</span></div>
+            <form action="{{ url_for('delete_transfer', transfer_id=t.id) }}" method="post">
+              <input type="hidden" name="user_id" value="{{ active_user_id }}">
+              <button type="submit">Delete</button>
+            </form>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div>No transfers yet.</div>
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: sw_demo
+      POSTGRES_USER: sw_user
+      POSTGRES_PASSWORD: sw_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sw_user -d sw_demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  web:
+    build: .
+    ports:
+      - "3228:3228"
+    environment:
+      POSTGRES_DSN: "dbname=sw_demo user=sw_user password=sw_pass host=db"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
